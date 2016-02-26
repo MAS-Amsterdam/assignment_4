@@ -70,13 +70,30 @@ to go
   ; This method executes the main processing cycle of an agent.
   ; For Assignment 4.1, this involves updating desires, beliefs and intentions, and executing actions (and advancing the tick counter).
 
+  update-vision
   update-desires
+
   update-beliefs
   update-intentions
   execute-actions
   tick
 end
 
+to update-vision
+  ask patches [set plabel ""]
+     ask vacuums [
+   foreach (n-values num_agents [?]) [
+     ask vacuum ? [
+       set color item ? color_list
+       set own_color color]]
+    ask patches in-cone-nowrap vision_radius 360
+   [
+    set plabel-color white
+     set plabel "*"
+    ]
+   ]
+
+end
 
 ; --- Setup patches ---
 to setup-patches
@@ -166,15 +183,17 @@ to execute-actions
 
 
   ask vacuums [
+    ifelse (desire = 0)
+    [stop]
+    [
+
     ifelse (intention != nobody)[
     face intention
     ]
     [
       right random 360
       ]
-  ]
 
-  ask vacuums [
     if (own_color = pcolor)[
       set pcolor black; if it is dirty then I clean it
       set beliefs sort beliefs
@@ -182,7 +201,7 @@ to execute-actions
       ]
       if can-move? 1 [fd 1]
     ]
-
+  ]
 
 end
 @#$#@#$#@
@@ -288,7 +307,7 @@ num_agents
 num_agents
 2
 7
-5
+3
 1
 1
 NIL
@@ -303,7 +322,7 @@ vision_radius
 vision_radius
 0
 100
-6
+4
 1
 1
 NIL
