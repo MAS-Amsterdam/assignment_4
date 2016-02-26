@@ -150,7 +150,9 @@ end
 to update-intentions
   ; You should update your agent's intentions here.
   ask vacuums[
-     set intention (min-one-of beliefs [distance myself])
+    ifelse (beliefs != [])[
+     set intention (min-one-of beliefs [distance myself])]
+    [set intention nobody]
   ]
 end
 
@@ -160,14 +162,34 @@ to execute-actions
   ; Here you should put the code related to the actions performed by your agent: moving, cleaning, and (actively) looking around.
   ; Please note that your agents should perform only one action per tick!
 
+
   ask vacuums [
-    ifelse (intention = nobody)
-    []
-    [
+    if (own_color = pcolor)[
+      set pcolor black; if it is dirty then I clean it
+      set beliefs sort beliefs
+      set beliefs remove intention beliefs
+      ]
+;    if can-move? 1 [fd 1]
+    ]
+
+  update-intentions
+
+  ask vacuums [
+    ifelse (intention != nobody)[
     face intention
     fd 1
     ]
+    [
+;      facexy ((random 24) - 12) (random 24 12)
+      right random 360
+;      if can-move? 1 [fd 1]
+      ]
   ]
+
+
+
+
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
