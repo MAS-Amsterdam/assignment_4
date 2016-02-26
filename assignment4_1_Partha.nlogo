@@ -108,7 +108,7 @@ to setup-vacuums
     ask patches in-cone-nowrap vision_radius 360
    [
     set plabel-color white
-     set plabel "*"
+     set plabel "8"
     ]
    ]
 
@@ -152,7 +152,13 @@ end
 to update-intentions
   ; You should update your agent's intentions here.
   ask vacuums [
+    ifelse beliefs != []
+    [
     set intention (min-one-of beliefs [distance myself] )
+    ]
+    [
+      set intention nobody
+    ]
   ]
 end
 
@@ -161,6 +167,53 @@ end
 to execute-actions
   ; Here you should put the code related to the actions performed by your agent: moving, cleaning, and (actively) looking around.
   ; Please note that your agents should perform only one action per tick!
+  ask vacuums [
+
+    if (pcolor = own_color)
+    [
+      set pcolor black
+      ;let ind (item intention beliefs)
+      set beliefs sort beliefs
+      set beliefs remove intention beliefs
+    ]
+
+    ask patches in-cone-nowrap vision_radius 360
+   [
+    set plabel-color white
+     set plabel ""
+    ]
+
+    ifelse (intention != nobody)
+    [
+      ifelse (desire != 0)
+    [
+      face intention
+    forward 1
+    ]
+    [
+      stop
+    ]
+    ]
+    [
+      ;if (can-move? 1)
+      ifelse (desire != 0)
+      [
+        ;ifelse (
+      facexy (( random 24) - 12 ) ((random 24) - 12)
+      forward 1
+      ]
+      [
+        stop
+      ]
+    ]
+
+    ask patches in-cone-nowrap vision_radius 360
+   [
+    set plabel-color white
+     set plabel "8"
+    ]
+
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -199,7 +252,7 @@ dirt_pct
 dirt_pct
 0
 100
-4
+2
 1
 1
 NIL
@@ -280,7 +333,7 @@ vision_radius
 vision_radius
 0
 100
-3
+9
 1
 1
 NIL
