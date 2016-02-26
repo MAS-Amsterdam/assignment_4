@@ -116,6 +116,7 @@ end
 ; --- Setup ticks ---
 to setup-ticks
   ; In this method you may start the tick counter.
+  reset-ticks
 end
 
 
@@ -123,6 +124,7 @@ end
 to update-desires
   ; You should update your agent's desires here.
   ; Keep in mind that now you have more than one agent.
+   foreach (n-values num_agents [?]) [ask vacuum ? [set desire (count patches with [pcolor = (item ? color_list)])]]
 end
 
 
