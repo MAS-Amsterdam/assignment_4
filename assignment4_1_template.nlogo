@@ -133,11 +133,11 @@ to update-beliefs
  ; You should update your agent's beliefs here.
  ; Please remember that you should use this method whenever your agents changes its position.
  ask vacuums [
-   let blf beliefs
+;
    let oc own_color
-   let around  ((patches in-cone-nowrap vision_radius 360) with [pcolor = oc])
-   show around
-   set beliefs  patches with [(member? self blf) or (member? self around)]]
+   set around (patches in-cone-nowrap vision_radius 360) with [pcolor = oc]
+   let blf beliefs
+   set beliefs  (belief + around]
 end
 
 
