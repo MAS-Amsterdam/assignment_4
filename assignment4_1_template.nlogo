@@ -149,6 +149,7 @@ end
 ; --- Update intentions ---
 to update-intentions
   ; You should update your agent's intentions here.
+;  set intention ()
 end
 
 
