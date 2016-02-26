@@ -142,6 +142,7 @@ to update-beliefs
    let old_b beliefs
    let new_b (patch-set around old_b)
    set beliefs new_b
+   set beliefs sort-on [distance myself] beliefs
  ]
 end
 
@@ -150,9 +151,10 @@ end
 to update-intentions
   ; You should update your agent's intentions here.
   ask vacuums[
-    ifelse (beliefs != [])[
-     set intention (min-one-of beliefs [distance myself])]
+    ifelse (beliefs = [])
     [set intention nobody]
+    [set intention (first beliefs)]
+
   ]
 end
 
@@ -164,30 +166,22 @@ to execute-actions
 
 
   ask vacuums [
+    ifelse (intention != nobody)[
+    face intention
+    ]
+    [
+      right random 360
+      ]
+  ]
+
+  ask vacuums [
     if (own_color = pcolor)[
       set pcolor black; if it is dirty then I clean it
       set beliefs sort beliefs
       set beliefs remove intention beliefs
       ]
-;    if can-move? 1 [fd 1]
+      if can-move? 1 [fd 1]
     ]
-
-  update-intentions
-
-  ask vacuums [
-    ifelse (intention != nobody)[
-    face intention
-    fd 1
-    ]
-    [
-;      facexy ((random 24) - 12) (random 24 12)
-      right random 360
-;      if can-move? 1 [fd 1]
-      ]
-  ]
-
-
-
 
 
 end
@@ -228,7 +222,7 @@ dirt_pct
 dirt_pct
 0
 100
-3
+2
 1
 1
 NIL
@@ -294,7 +288,7 @@ num_agents
 num_agents
 2
 7
-2
+5
 1
 1
 NIL
@@ -309,7 +303,7 @@ vision_radius
 vision_radius
 0
 100
-3
+6
 1
 1
 NIL
