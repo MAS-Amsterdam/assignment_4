@@ -74,6 +74,7 @@ to go
   update-beliefs
   update-intentions
   execute-actions
+  visio-cones
   tick
 end
 
@@ -105,9 +106,10 @@ to setup-vacuums
    foreach (n-values num_agents [?]) [ask vacuum ?
      [set color item ? color_list
        set own_color color ]]
+   let oc own_color
     ask patches in-cone-nowrap vision_radius 360
    [
-    set plabel-color white
+    set plabel-color oc
      set plabel "8"
     ]
    ]
@@ -162,7 +164,20 @@ to update-intentions
   ]
 end
 
+to visio-cones
 
+  ask patches [ set plabel ""]
+
+  ask vacuums[
+    let oc own_color
+  ask patches in-cone-nowrap vision_radius 360
+   [
+    set plabel-color oc
+     set plabel "8"
+    ]
+
+  ]
+end
 ; --- Execute actions ---
 to execute-actions
   ; Here you should put the code related to the actions performed by your agent: moving, cleaning, and (actively) looking around.
@@ -177,11 +192,13 @@ to execute-actions
       set beliefs remove intention beliefs
     ]
 
-    ask patches in-cone-nowrap vision_radius 360
-   [
-    set plabel-color white
-     set plabel ""
-    ]
+;    ask patches in-cone-nowrap vision_radius 360
+;   [
+;    set plabel-color white
+;     set plabel ""
+;    ]
+
+    ;ask patches
 
     ifelse (intention != nobody)
     [
@@ -198,20 +215,21 @@ to execute-actions
       ;if (can-move? 1)
       ifelse (desire != 0)
       [
-        ;ifelse (
+        ifelse can-move? 1
+        [
+          forward 1
+          ;visio-cones
+        ]
+        [
       facexy (( random 24) - 12 ) ((random 24) - 12)
-      forward 1
+        ]
+      ;forward 1
       ]
       [
         stop
       ]
     ]
 
-    ask patches in-cone-nowrap vision_radius 360
-   [
-    set plabel-color white
-     set plabel "8"
-    ]
 
   ]
 end
@@ -333,7 +351,7 @@ vision_radius
 vision_radius
 0
 100
-9
+6
 1
 1
 NIL
