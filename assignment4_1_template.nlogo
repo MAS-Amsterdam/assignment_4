@@ -24,7 +24,7 @@
 ;
 ; 1) total_dirty: this variable represents the amount of dirty cells in the environment.
 ; 2) time: the total simulation time.
-globals [total_dirty time]
+globals [total_dirty time color_list index_list]
 
 
 ; --- Agents ---
@@ -41,12 +41,23 @@ breed [vacuums vacuum]
 ; 2) desire: the agent's current desire
 ; 3) intention: the agent's current intention
 ; 4) own_color: the agent's belief about its own target color
-vacuums-own [beliefs desire intention own_color]
+vacuums-own [index beliefs desire intention own_color]
 
 
+patches-own [ ]
+
+undirected-link-breed [red-links red-link]
 ; --- Setup ---
 to setup
+  clear-all
+
   set time 0
+
+  set color_list n-of num_agents [yellow green blue red pink brown grey]
+  ;set index_list first-n num_agents [0 1 2 3 4 5 6]
+
+  ;set index_list n-values num_agents [?]
+
   setup-patches
   setup-vacuums
   setup-ticks
@@ -55,8 +66,10 @@ end
 
 ; --- Main processing cycle ---
 to go
+
   ; This method executes the main processing cycle of an agent.
   ; For Assignment 4.1, this involves updating desires, beliefs and intentions, and executing actions (and advancing the tick counter).
+
   update-desires
   update-beliefs
   update-intentions
@@ -68,12 +81,35 @@ end
 ; --- Setup patches ---
 to setup-patches
   ; In this method you may create the environment (patches), using colors to define cells with various types of dirt.
+  ;resize-world 0 (width - 1) 0 ( height - 1)
+  ;set-patch-size 400 / width
+  ;ask patches [set pcolor green]
+
+  set total_dirty  ( dirt_pct / 100 * 24 * 24 )
+  ; ask n-of total_dirty patches [set pcolor grey]
+  ask n-of total_dirty patches [set pcolor one-of color_list
+       ]
+;ask patches [ set plabel "+" ]
 end
 
 
 ; --- Setup vacuums ---
 to setup-vacuums
   ; In this method you may create the vacuum cleaner agents.
+  create-vacuums num_agents [
+   setxy (( random 24) - 12 ) ((random 24) - 12)]
+   ask vacuums [
+   set desire (count patches with [ pcolor = grey ]) ; initialised desire to reduce the totoal amount of dirty cells
+    ; set color color_list [index]
+
+   ; foreach index_list [ask vacuum ? [set color item ? color_list]]
+    ask patches in-cone-nowrap vision_radius 360
+   [
+    set plabel-color white
+     set plabel "*"
+    ]
+   ]
+
 end
 
 
@@ -112,11 +148,11 @@ end
 GRAPHICS-WINDOW
 786
 17
-1386
-638
+1171
+423
 12
 12
-23.6
+15.0
 1
 10
 1
@@ -145,7 +181,7 @@ dirt_pct
 dirt_pct
 0
 100
-2
+43
 1
 1
 NIL
@@ -211,7 +247,7 @@ num_agents
 num_agents
 2
 7
-3
+2
 1
 1
 NIL
