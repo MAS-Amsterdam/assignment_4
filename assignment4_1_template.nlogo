@@ -24,7 +24,7 @@
 ;
 ; 1) total_dirty: this variable represents the amount of dirty cells in the environment.
 ; 2) time: the total simulation time.
-globals [total_dirty time color_list index_list]
+globals [total_dirty time color_list]
 
 
 ; --- Agents ---
@@ -41,7 +41,7 @@ breed [vacuums vacuum]
 ; 2) desire: the agent's current desire
 ; 3) intention: the agent's current intention
 ; 4) own_color: the agent's belief about its own target color
-vacuums-own [index beliefs desire intention own_color]
+vacuums-own [beliefs desire intention own_color]
 
 
 patches-own [ ]
@@ -102,7 +102,7 @@ to setup-vacuums
    set desire (count patches with [ pcolor = grey ]) ; initialised desire to reduce the totoal amount of dirty cells
     ; set color color_list [index]
 
-   ; foreach index_list [ask vacuum ? [set color item ? color_list]]
+   foreach (n-values num_agents [?]) [ask vacuum ? [set color item ? color_list]]
     ask patches in-cone-nowrap vision_radius 360
    [
     set plabel-color white
