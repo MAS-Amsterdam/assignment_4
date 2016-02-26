@@ -102,7 +102,10 @@ to setup-vacuums
    set desire (count patches with [ pcolor = grey ]) ; initialised desire to reduce the totoal amount of dirty cells
     ; set color color_list [index]
    set beliefs []
-   foreach (n-values num_agents [?]) [ask vacuum ? [set color item ? color_list]]
+   foreach (n-values num_agents [?]) [
+     ask vacuum ? [
+       set color item ? color_list
+       set own_color color]]
     ask patches in-cone-nowrap vision_radius 360
    [
     set plabel-color white
@@ -135,9 +138,11 @@ to update-beliefs
  ask vacuums [
 ;
    let oc own_color
-   set around (patches in-cone-nowrap vision_radius 360) with [pcolor = oc]
-   let blf beliefs
-   set beliefs  (belief + around]
+   let around (((patches) in-cone-nowrap vision_radius 360) with [pcolor = oc])
+   let old_b beliefs
+   let new_b (patch-set around old_b)
+   set beliefs new_b
+ ]
 end
 
 
@@ -270,7 +275,7 @@ vision_radius
 vision_radius
 0
 100
-4
+3
 1
 1
 NIL
