@@ -149,7 +149,9 @@ end
 ; --- Update intentions ---
 to update-intentions
   ; You should update your agent's intentions here.
-;  set intention ()
+  ask vacuums[
+     set intention (min-one-of beliefs [distance myself])
+  ]
 end
 
 
@@ -157,6 +159,15 @@ end
 to execute-actions
   ; Here you should put the code related to the actions performed by your agent: moving, cleaning, and (actively) looking around.
   ; Please note that your agents should perform only one action per tick!
+
+  ask vacuums [
+    ifelse (intention = nobody)
+    []
+    [
+    face intention
+    fd 1
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
