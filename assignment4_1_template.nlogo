@@ -191,7 +191,9 @@ to execute-actions
     face intention
     ]
     [
-      right random 360
+      ifelse can-move? 1
+      [fd 1]
+      [right random 360]
       ]
 
     if (own_color = pcolor)[
