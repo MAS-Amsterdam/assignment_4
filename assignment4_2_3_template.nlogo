@@ -45,7 +45,7 @@ breed [vacuums vacuum]
 ; 6) outgoing_messages: list of messages sent by the agent to other agents
 ; 7) incoming_messages: list of messages received by the agent from other agents
 ; 8) out: the message to be sent to other agents
-vacuums-own [beliefs desire intention own_color other_colors outgoing_messages out incoming_messages]
+vacuums-own [beliefs desire intention own_color other_colors outgoing_messages all_out incoming_messages]
 
 
 ; --- Setup ---
@@ -114,7 +114,7 @@ to setup-vacuums
    setxy (( random 24) - 12 ) ((random 24) - 12)]
 
    ask vacuums [
-   set out []
+   set all_out []
    set beliefs []
    set outgoing_messages []
        set incoming_messages []
@@ -163,7 +163,12 @@ to update-beliefs
  ; Also note that this method should distinguish between two cases, namely updating beliefs based on 1) observed information and 2) received messages.
   ask vacuums [
 ;
-   set beliefs remove intention beliefs
+   ; set beliefs remove intention beliefs
+
+   ; update the belief with the new information from other agents
+   set beliefs (patch-set incoming_messages beliefs)
+
+
    let oc own_color
    let around (((patches) in-cone-nowrap vision_radius 360) with [pcolor = oc])
    let old_b beliefs
@@ -181,11 +186,12 @@ to update-beliefs
   ; remove the elements of message_out from around_others to obtain the newly discovered patches
   foreach (around_others) [
      ; fput
-     ; if it is in the outgoing_messages then I disgard it
-     ifelse (member? ? outgoing_messages)
+     ; if it is in the outgoing messages before then I disgard it
+     ifelse (member? ? all_out)
      []; simply disgard it
      [ ; otherwise, we prepare to send the message, i.e. update the out box
-       set out (fput ? out) ; as my current message to be sent
+       set outgoing_messages (fput ? outgoing_messages) ; as my current message to be sent
+       set all_out (fput ? all_out)
        ]
      ]
 ]
@@ -225,8 +231,8 @@ to execute-actions
 
     if (own_color = pcolor)[
       set pcolor black; if it is dirty then I clean it
-      ;set beliefs sort beliefs
-      ;set beliefs remove intention beliefs
+      set beliefs remove intention beliefs
+      set beliefs sort beliefs
       ]
       if can-move? 1 [fd 1]
     ]
@@ -239,7 +245,7 @@ to send-messages
   ; Here should put the code related to sending messages to other agents.
   ; Note that this could be seen as a special case of executing actions, but for conceptual clarity it has been put in a separate method.
   ask vacuums [
-     foreach (out) [
+     foreach (outgoing_messages) [
      let pcl ([pcolor] of ?)
      let msg ?
      ask vacuums
