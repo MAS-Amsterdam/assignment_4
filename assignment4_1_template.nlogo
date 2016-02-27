@@ -104,9 +104,8 @@ to setup-patches
 
   set total_dirty  ( dirt_pct / 100 * 24 * 24 )
   ; ask n-of total_dirty patches [set pcolor grey]
-  ask n-of total_dirty patches [set pcolor one-of color_list
-       ]
-;ask patches [ set plabel "+" ]
+  ask n-of total_dirty patches [set pcolor one-of color_list ]
+  ;ask patches [ set plabel "+" ]
 end
 
 
@@ -115,15 +114,15 @@ to setup-vacuums
   ; In this method you may create the vacuum cleaner agents.
   create-vacuums num_agents [
    setxy (( random 24) - 12 ) ((random 24) - 12)]
+
    ask vacuums [
-   set desire (count patches with [ pcolor = grey ]) ; initialised desire to reduce the totoal amount of dirty cells
-    ; set color color_list [index]
+
    set beliefs []
-   foreach (n-values num_agents [?]) [
-     ask vacuum ? [
+   foreach (n-values num_agents [?]) [ ask vacuum ? [
        set color item ? color_list
        set own_color color]]
-    ask patches in-cone-nowrap vision_radius 360
+
+   ask patches in-cone-nowrap vision_radius 360
    [
     set plabel-color white
      set plabel "*"
@@ -145,6 +144,7 @@ to update-desires
   ; You should update your agent's desires here.
   ; Keep in mind that now you have more than one agent.
    foreach (n-values num_agents [?]) [ask vacuum ? [set desire (count patches with [pcolor = (item ? color_list)])]]
+
 end
 
 
@@ -154,6 +154,7 @@ to update-beliefs
  ; Please remember that you should use this method whenever your agents changes its position.
  ask vacuums [
 ;
+   set beliefs remove intention beliefs
    let oc own_color
    let around (((patches) in-cone-nowrap vision_radius 360) with [pcolor = oc])
    let old_b beliefs
@@ -190,16 +191,15 @@ to execute-actions
     ifelse (intention != nobody)[
     face intention
     ]
-    [
-      ifelse can-move? 1
+    [ ifelse can-move? 1
       [fd 1]
       [right random 360]
       ]
 
     if (own_color = pcolor)[
       set pcolor black; if it is dirty then I clean it
-      set beliefs sort beliefs
-      set beliefs remove intention beliefs
+      ;set beliefs sort beliefs
+      ;set beliefs remove intention beliefs
       ]
       if can-move? 1 [fd 1]
     ]
@@ -243,7 +243,7 @@ dirt_pct
 dirt_pct
 0
 100
-2
+4
 1
 1
 NIL
