@@ -299,9 +299,9 @@ SLIDER
 166
 dirt_pct
 dirt_pct
-0
+num_agents * threshold
 100
-14
+100
 1
 1
 NIL
@@ -344,7 +344,7 @@ NIL
 BUTTON
 6
 243
-772
+393
 276
 NIL
 setup
@@ -382,7 +382,7 @@ vision_radius
 vision_radius
 0
 100
-2
+5
 1
 1
 NIL
@@ -596,6 +596,21 @@ time
 17
 1
 11
+
+SLIDER
+404
+242
+576
+275
+threshold
+threshold
+0
+100
+51
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
