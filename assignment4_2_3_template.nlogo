@@ -44,7 +44,8 @@ breed [vacuums vacuum]
 ; 5) other_colors: the agent's belief about the target colors of other agents
 ; 6) outgoing_messages: list of messages sent by the agent to other agents
 ; 7) incoming_messages: list of messages received by the agent from other agents
-vacuums-own [beliefs desire intention own_color other_colors outgoing_messages incoming_messages]
+; 8) out: the message to be sent to other agents
+vacuums-own [beliefs desire intention own_color other_colors outgoing_messages out incoming_messages]
 
 
 ; --- Setup ---
@@ -113,8 +114,11 @@ to setup-vacuums
    setxy (( random 24) - 12 ) ((random 24) - 12)]
 
    ask vacuums [
-
+   set out []
    set beliefs []
+   set outgoing_messages []
+       set incoming_messages []
+
 
    foreach (n-values num_agents [?]) [ ask vacuum ?
      [
@@ -122,8 +126,6 @@ to setup-vacuums
        set own_color color
        ; new in a
        set other_colors  ( remove own_color color_list)
-       set outgoing_messages []
-       set incoming_messages []
 
        ]
    ]
@@ -168,7 +170,25 @@ to update-beliefs
    let new_b (patch-set around old_b)
    set beliefs new_b
    set beliefs sort-on [distance myself] beliefs
- ]
+
+
+  ; update the message to be sent (out)
+  ; out = newly discovered dirts - the location of the dirts the agent already sent, which is outgoing_message
+  ; each message, there is the color of the dirt and the location of the dirt?
+
+  let around_others (((patches) in-cone-nowrap vision_radius 360) with [pcolor != oc])
+  set around_others sort-on [distance myself] around_others
+  ; remove the elements of message_out from around_others to obtain the newly discovered patches
+  foreach (around_others) [
+     ; fput
+     ; if it is in the outgoing_messages then I disgard it
+     ifelse (member? ? outgoing_messages)
+     []; simply disgard it
+     [ ; otherwise, we prepare to send the message, i.e. update the out box
+       set out (fput ? out) ; as my current message to be sent
+       ]
+     ]
+]
 end
 
 
@@ -218,7 +238,23 @@ end
 to send-messages
   ; Here should put the code related to sending messages to other agents.
   ; Note that this could be seen as a special case of executing actions, but for conceptual clarity it has been put in a separate method.
+  ask vacuums [
+     foreach (out) [
+     let pcl ([pcolor] of ?)
+     let msg ?
+     ask vacuums
+     [
+       ; if the agent's color is the same as pcl, then add the message to the agent's inbox
+       if (color = pcl)
+       [
+         set incoming_messages (fput msg incoming_messages)
+         ]
+      ]
+   ]
+  ]
+
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 786
@@ -256,7 +292,7 @@ dirt_pct
 dirt_pct
 0
 100
-3
+14
 1
 1
 NIL
