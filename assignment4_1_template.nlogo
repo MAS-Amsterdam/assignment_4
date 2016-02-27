@@ -86,7 +86,7 @@ to update-vision
      ask vacuum ? [
        set color item ? color_list
        set own_color color]]
-    ask patches in-cone-nowrap vision_radius 360
+    ask patches in-cone-nowrap (vision_radius * 12 / 100) 360
    [
     set plabel-color white
      set plabel "*"
@@ -102,7 +102,7 @@ to setup-patches
   ;set-patch-size 400 / width
   ;ask patches [set pcolor green]
 
-  set total_dirty  ( dirt_pct / 100 * 24 * 24 )
+  set total_dirty  ( dirt_pct / 100 * 25 * 25 )
   ; ask n-of total_dirty patches [set pcolor grey]
   ask n-of total_dirty patches [set pcolor one-of color_list ]
   ;ask patches [ set plabel "+" ]
@@ -113,7 +113,7 @@ end
 to setup-vacuums
   ; In this method you may create the vacuum cleaner agents.
   create-vacuums num_agents [
-   setxy (( random 24) - 12 ) ((random 24) - 12)]
+   setxy (( random 25) - 12 ) ((random 25) - 12)]
 
    ask vacuums [
 
@@ -122,7 +122,7 @@ to setup-vacuums
        set color item ? color_list
        set own_color color]]
 
-   ask patches in-cone-nowrap vision_radius 360
+   ask patches in-cone-nowrap (vision_radius * 12 / 100) 360
    [
     set plabel-color white
      set plabel "*"
@@ -155,9 +155,10 @@ to update-beliefs
  ask vacuums [
 ;
    set beliefs remove intention beliefs
+
    let oc own_color
-   let around (((patches) in-cone-nowrap vision_radius 360) with [pcolor = oc])
-   let old_b beliefs
+   let around ((patches in-cone-nowrap (vision_radius * 12 / 100) 360) with [pcolor = oc])
+     let old_b beliefs
    let new_b (patch-set around old_b)
    set beliefs new_b
    set beliefs sort-on [distance myself] beliefs
@@ -243,7 +244,7 @@ dirt_pct
 dirt_pct
 0
 100
-4
+7
 1
 1
 NIL
@@ -309,7 +310,7 @@ num_agents
 num_agents
 2
 7
-3
+2
 1
 1
 NIL
@@ -324,7 +325,7 @@ vision_radius
 vision_radius
 0
 100
-4
+22
 1
 1
 NIL
