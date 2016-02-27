@@ -480,39 +480,50 @@ time
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+This model explores the behavior of multiple smart vacuum cleaners with beliefs, desires and intentions. They all have the desire to clean all the dirts matching their colours in the environment. Each of the agents have a vision cone, which denotes the distance and the area it can see. The agents can know of only the dirts within their respective vision range. The agents can only clean dust that is of the same colours as them. The agents have the desire to clean all the dirt in the environment. They stop as soon as the last dirt corresponding to their colour has been cleaned. The agents do not communicate with each other. They move in a random direction, if they can't see any dirt in their vision radius, till they hit a wall after which they randomly change their direction.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+The vacuum sets up its beliefs about the location of the dirts in the environment, and the location is ranked in left-to-right,top-to-bottom order. The vacuum updates its beliefs every step to check and remove the dirts' location that has been cleaned, and accordingly updates its desire and intentions.
+It has desires to clean all the dirts in the environment, when there is no dirt, the vacuum dies (disappear).
+It has the intention to clean the location ranking first in the current beliefs base.
+
+Each of the sets up their own beliefs about the
 
 ## HOW TO USE IT
+Slider dirt_pct: Sets the dirt percent for the world
+Button setup: Sets up the world with the initial values defined in the function setup Button go: This triggers the agent code to run.
+Slider width: Sets the width of the grid.
+Slider height: Sets the height of the grid.
 
-(how to use the model, including a description of each of the items in the Interface tab)
+1) Set the dirt percent with the slider.
+2) Set the height of the grid with the slider.
+3) Set the width of the grid with the slider.
+4) Setup the world with the setup button.
+5) Execute the model by pressing the go button on the right side. To see how the vacuum behave in a single step, press the go button on the left side.
+
+
 
 ## THINGS TO NOTICE
+The number of dirty cells left is tracked on the monitor labelled "dirt".
+The vacuums current desire is tracked on the monitor labelled "The agent's current desire" . Note it will decrease as the cacuum cleans dirt. When it is 0, the vacuum has no desires, and dies.
+The vacuum's beliefs about the dirts' location is tracked on the monitor labelled "The agent's current belief base".
+The vacuum's intention is tracked on the monitor labelled"The agent's current intention". Note that the vacuums intention will alwyas be the first belief on the beliefs base.
+The total time it took to clean the environment is tracked on the monitor labelled"Total simulation time".
 
-(suggested things for the user to notice while running the model)
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+The dirt percentage can be modified by using the slider labelled dirt_pct.
+The grid height and the width can be modified by using the slider labelled heigth and width, respectively.
+How is the variance of the time it took to clean the environment varies as the percentage of dirts changes.
 
-## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
 
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+## CREDITS
+Shuai Wang (11108339)
+ Kaixin Hu (11129417)
+Partha Das (11137053)
 @#$#@#$#@
 default
 true

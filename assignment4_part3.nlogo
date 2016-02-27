@@ -45,7 +45,7 @@ breed [vacuums vacuum]
 ; 6) outgoing_messages: list of messages sent by the agent to other agents
 ; 7) incoming_messages: list of messages received by the agent from other agents
 ; 8) all_out: the messages to be sent to other agents (so it does not send the same messages again)
-vacuums-own [beliefs desire intention own_color other_colors outgoing_messages all_out incoming_messages color_record]
+vacuums-own [beliefs desire intention own_color other_colors outgoing_messages all_out incoming_messages color_record observed]
 
 
 ; --- Setup ---
@@ -81,7 +81,8 @@ end
 to update-vision
   ask patches [set plabel ""]
      ask vacuums [
-   foreach (n-values num_agents [?]) [
+       ifelse (own_color != white)
+   [foreach (n-values num_agents [?]) [
      ask vacuum ? [
        set color item ? color_list
        set own_color color]]
@@ -89,7 +90,14 @@ to update-vision
    [
     set plabel-color white
      set plabel "*"
+    ]]
+   [
+     ask patches in-cone-nowrap vision_radius 360
+   [
+    set plabel-color white
+     set plabel "*"
     ]
+   ]
    ]
 
 end
@@ -137,7 +145,7 @@ to setup-vacuums
 ;
 ;       ]
 ;   ]
-
+      set observed []
        set color_record []
 
        ;foreach (n-values num_agents [?])
@@ -149,6 +157,7 @@ to setup-vacuums
          ]
 
      set color white
+     set own_color white
    ask patches in-cone-nowrap vision_radius 360
    [
     set plabel-color white
@@ -187,14 +196,24 @@ to update-beliefs
     ifelse (own_color = white)
     [
 
-      let around ((patches) in-cone-nowrap vision_radius 360) with [pcolor != black]
+      let around  ((patches) in-cone-nowrap vision_radius 360) with [(pcolor != black)]
+      let tmp_set []
+      let around_l (sort around)
+      foreach around_l [
+        if (not(member? ? observed)) ; not previously observed
+        [set tmp_set (fput ? tmp_set)]
+        ]
+      set around tmp_set; new around
+
+      ; set around (around with [not(member? self observed)])
        foreach (color_record) [
          ;show ?
          let clr (first ?)
          let count_clr (last ?)
 
          let count_ 0
-         set count_clr ((count (around with [pcolor = clr])) + count_clr)
+         let l (length sort-on [distance myself] ( around with [pcolor = clr]))
+         set count_clr ((l) + count_clr)
          let tmp (position ? color_record)
          show tmp
          set color_record replace-item tmp color_record (list clr count_clr)
@@ -204,7 +223,7 @@ to update-beliefs
 
 
          ]
-
+      set observed (patch-set around observed)
       ]
    ; set beliefs remove intention beliefs
 
@@ -425,7 +444,7 @@ vision_radius
 vision_radius
 0
 100
-8
+9
 1
 1
 NIL
