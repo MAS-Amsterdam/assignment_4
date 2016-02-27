@@ -3,7 +3,7 @@
 ; Lab assistants: D. Formolo & L. Medeiros
 
 
-; --- Assignment 4.2 & 4.3 - Template ---
+; --- Assignment 4.1 - Template ---
 ; Please use this template as a basis for the code to generate the behaviour of your team of vacuum cleaners.
 ; However, feel free to extend this with any variable or method you think is necessary.
 
@@ -41,41 +41,54 @@ breed [vacuums vacuum]
 ; 2) desire: the agent's current desire
 ; 3) intention: the agent's current intention
 ; 4) own_color: the agent's belief about its own target color
-; 5) other_colors: the agent's belief about the target colors of other agents
-; 6) outgoing_messages: list of messages sent by the agent to other agents
-; 7) incoming_messages: list of messages received by the agent from other agents
-vacuums-own [beliefs desire intention own_color other_colors outgoing_messages incoming_messages]
+vacuums-own [beliefs desire intention own_color]
 
 
+patches-own [ ]
+
+undirected-link-breed [red-links red-link]
 ; --- Setup ---
 to setup
-   clear-all
+  clear-all
 
   set time 0
 
   set color_list n-of num_agents [yellow green blue red pink brown grey]
+  ;set index_list first-n num_agents [0 1 2 3 4 5 6]
 
+  ;set index_list n-values num_agents [?]
 
   setup-patches
   setup-vacuums
   setup-ticks
+  setup-links
+end
+
+to setup-links
+  ; the following is to create a link between agents
+
+  ask vacuums
+  [
+    ask turtle 0 [ create-links-with other turtles ]
+    ask turtle 1 [ create-link-with turtle 2 ]
+    ]
 end
 
 
 ; --- Main processing cycle ---
 to go
+
   ; This method executes the main processing cycle of an agent.
-  ; For Assignment 4.2 and 4.3, this involves updating desires, beliefs and intentions, executing actions, and sending messages (and advancing the tick counter).
-  update-vision ; new method
+  ; For Assignment 4.1, this involves updating desires, beliefs and intentions, and executing actions (and advancing the tick counter).
+
+  update-vision
   update-desires
+
   update-beliefs
   update-intentions
   execute-actions
-  send-messages
   tick
 end
-
-
 
 to update-vision
   ask patches [set plabel ""]
@@ -96,37 +109,29 @@ end
 ; --- Setup patches ---
 to setup-patches
   ; In this method you may create the environment (patches), using colors to define cells with various types of dirt.
+  ;resize-world 0 (width - 1) 0 ( height - 1)
+  ;set-patch-size 400 / width
+  ;ask patches [set pcolor green]
 
   set total_dirty  ( dirt_pct / 100 * 24 * 24 )
   ; ask n-of total_dirty patches [set pcolor grey]
   ask n-of total_dirty patches [set pcolor one-of color_list ]
   ;ask patches [ set plabel "+" ]
-
 end
 
 
 ; --- Setup vacuums ---
 to setup-vacuums
   ; In this method you may create the vacuum cleaner agents.
- ; In this method you may create the vacuum cleaner agents.
   create-vacuums num_agents [
    setxy (( random 24) - 12 ) ((random 24) - 12)]
 
    ask vacuums [
 
    set beliefs []
-
-   foreach (n-values num_agents [?]) [ ask vacuum ?
-     [
+   foreach (n-values num_agents [?]) [ ask vacuum ? [
        set color item ? color_list
-       set own_color color
-       ; new in a
-       set other_colors  ( remove own_color color_list)
-       set outgoing_messages []
-       set incoming_messages []
-
-       ]
-   ]
+       set own_color color]]
 
    ask patches in-cone-nowrap vision_radius 360
    [
@@ -141,7 +146,7 @@ end
 ; --- Setup ticks ---
 to setup-ticks
   ; In this method you may start the tick counter.
-   reset-ticks
+  reset-ticks
 end
 
 
@@ -149,7 +154,7 @@ end
 to update-desires
   ; You should update your agent's desires here.
   ; Keep in mind that now you have more than one agent.
-  foreach (n-values num_agents [?]) [ask vacuum ? [set desire (count patches with [pcolor = (item ? color_list)])]]
+   foreach (n-values num_agents [?]) [ask vacuum ? [set desire (count patches with [pcolor = (item ? color_list)])]]
 
 end
 
@@ -158,8 +163,7 @@ end
 to update-beliefs
  ; You should update your agent's beliefs here.
  ; Please remember that you should use this method whenever your agents changes its position.
- ; Also note that this method should distinguish between two cases, namely updating beliefs based on 1) observed information and 2) received messages.
-  ask vacuums [
+ ask vacuums [
 ;
    set beliefs remove intention beliefs
    let oc own_color
@@ -175,12 +179,10 @@ end
 ; --- Update intentions ---
 to update-intentions
   ; You should update your agent's intentions here.
-    ; You should update your agent's intentions here.
   ask vacuums[
     ifelse (beliefs = [])
     [set intention nobody]
     [set intention (first beliefs)]
-
   ]
 end
 
@@ -189,6 +191,7 @@ end
 to execute-actions
   ; Here you should put the code related to the actions performed by your agent: moving, cleaning, and (actively) looking around.
   ; Please note that your agents should perform only one action per tick!
+
 
   ask vacuums [
     ifelse (desire = 0)
@@ -211,23 +214,18 @@ to execute-actions
       if can-move? 1 [fd 1]
     ]
   ]
-end
 
 
-; --- Send messages ---
-to send-messages
-  ; Here should put the code related to sending messages to other agents.
-  ; Note that this could be seen as a special case of executing actions, but for conceptual clarity it has been put in a separate method.
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 786
-46
-1303
-584
+17
+1171
+423
 12
 12
-20.31
+15.0
 1
 10
 1
@@ -248,25 +246,25 @@ ticks
 30.0
 
 SLIDER
-6
-133
-772
-166
+9
+118
+775
+151
 dirt_pct
 dirt_pct
 0
 100
-3
+4
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-6
-101
-390
-134
+9
+86
+393
+119
 NIL
 go
 NIL
@@ -280,10 +278,10 @@ NIL
 1
 
 BUTTON
-389
-101
-772
-134
+392
+86
+775
+119
 NIL
 go
 T
@@ -297,10 +295,10 @@ NIL
 1
 
 BUTTON
-6
-243
-772
-276
+9
+229
+775
+262
 NIL
 setup
 NIL
@@ -314,10 +312,10 @@ NIL
 1
 
 SLIDER
-6
-169
-772
-202
+9
+155
+775
+188
 num_agents
 num_agents
 2
@@ -329,25 +327,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-206
-772
-239
+8
+192
+775
+225
 vision_radius
 vision_radius
 0
 100
-2
+4
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-457
-276
-773
-321
+9
+349
+775
+394
 Intention of vacuum 1
 [intention] of vacuum 0
 17
@@ -355,10 +353,10 @@ Intention of vacuum 1
 11
 
 MONITOR
-114
-276
-459
-321
+9
+393
+775
+438
 Desire of vacuum 1
 [desire] of vacuum 0
 17
@@ -366,10 +364,10 @@ Desire of vacuum 1
 11
 
 MONITOR
-6
-320
-774
-365
+9
+305
+775
+350
 Beliefs of vacuum 1
 [beliefs] of vacuum 0
 17
@@ -377,10 +375,10 @@ Beliefs of vacuum 1
 11
 
 MONITOR
-5
-465
-772
-510
+10
+497
+776
+542
 Beliefs of vacuum 2
 [beliefs] of vacuum 1
 17
@@ -388,10 +386,10 @@ Beliefs of vacuum 2
 11
 
 MONITOR
-6
-276
-115
-321
+9
+262
+775
+307
 Color of vacuum 1
 [own_color] of vacuum 0
 17
@@ -399,10 +397,10 @@ Color of vacuum 1
 11
 
 MONITOR
-5
-421
-115
-466
+10
+453
+776
+498
 Color of vacuum 2
 [own_color] of vacuum 1
 17
@@ -410,10 +408,10 @@ Color of vacuum 2
 11
 
 MONITOR
-452
-421
-772
-466
+10
+541
+776
+586
 Intention of vacuum 2
 [intention] of vacuum 1
 17
@@ -421,10 +419,10 @@ Intention of vacuum 2
 11
 
 MONITOR
-115
-421
-452
-466
+10
+585
+776
+630
 Desire of vacuum 2
 [desire] of vacuum 1
 17
@@ -432,10 +430,10 @@ Desire of vacuum 2
 11
 
 MONITOR
-5
-566
-113
-611
+11
+642
+777
+687
 Color of vacuum 3
 [own_color] of vacuum 2
 17
@@ -443,10 +441,10 @@ Color of vacuum 3
 11
 
 MONITOR
-5
-610
-772
-655
+11
+686
+777
+731
 Beliefs of vacuum 3
 [beliefs] of vacuum 2
 17
@@ -454,10 +452,10 @@ Beliefs of vacuum 3
 11
 
 MONITOR
-453
-566
-772
-611
+11
+730
+777
+775
 Intention of vacuum 3
 [intention] of vacuum 2
 17
@@ -465,10 +463,10 @@ Intention of vacuum 3
 11
 
 MONITOR
-113
-566
-453
-611
+11
+774
+777
+819
 Desire of vacuum 3
 [desire] of vacuum 2
 17
@@ -476,76 +474,10 @@ Desire of vacuum 3
 11
 
 MONITOR
-6
-364
-385
-409
-Outgoing messages vacuum 1
-sort ([outgoing_messages] of vacuum 0)
-17
-1
-11
-
-MONITOR
-385
-364
-774
-409
-Incoming messages vacuum 1
-[incoming_messages] of vacuum 0
-17
-1
-11
-
-MONITOR
-5
-508
-389
-553
-Outgoing messages vacuum 2
-sort ([outgoing_messages] of vacuum 1)
-17
-1
-11
-
-MONITOR
-388
-508
-772
-553
-Incoming messages vacuum 2
-[incoming_messages] of vacuum 1
-17
-1
-11
-
-MONITOR
-6
-653
-389
-698
-Outgoing messages vacuum 3
-sort ([outgoing_messages] of vacuum 2)
-17
-1
-11
-
-MONITOR
-389
-653
-772
-698
-Incoming messages vacuum 3
-[incoming_messages] of vacuum 2
-17
-1
-11
-
-MONITOR
-7
-47
-771
-92
+9
+18
+775
+63
 Time to complete the task.
 time
 17
