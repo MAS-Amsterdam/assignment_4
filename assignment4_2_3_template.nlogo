@@ -167,7 +167,7 @@ to update-beliefs
 
    ; update the belief with the new information from other agents
    set beliefs (patch-set incoming_messages beliefs)
-
+   set incoming_messages []
 
    let oc own_color
    let around (((patches) in-cone-nowrap vision_radius 360) with [pcolor = oc])
@@ -181,7 +181,7 @@ to update-beliefs
   ; out = newly discovered dirts - the location of the dirts the agent already sent, which is outgoing_message
   ; each message, there is the color of the dirt and the location of the dirt?
 
-  let around_others (((patches) in-cone-nowrap vision_radius 360) with [pcolor != oc])
+  let around_others (((patches) in-cone-nowrap vision_radius 360) with [(pcolor != oc) and (pcolor != black)])
   set around_others sort-on [distance myself] around_others
   ; remove the elements of message_out from around_others to obtain the newly discovered patches
   foreach (around_others) [
@@ -231,6 +231,7 @@ to execute-actions
 
     if (own_color = pcolor)[
       set pcolor black; if it is dirty then I clean it
+      ; set intention nobody
       set beliefs remove intention beliefs
       set beliefs sort beliefs
       ]
@@ -257,6 +258,8 @@ to send-messages
          ]
       ]
    ]
+     set outgoing_messages []
+
   ]
 
 end
@@ -364,7 +367,7 @@ num_agents
 num_agents
 2
 7
-3
+2
 1
 1
 NIL
