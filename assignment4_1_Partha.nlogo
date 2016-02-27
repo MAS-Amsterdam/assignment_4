@@ -24,7 +24,7 @@
 ;
 ; 1) total_dirty: this variable represents the amount of dirty cells in the environment.
 ; 2) time: the total simulation time.
-globals [total_dirty time color_list]
+globals [total_dirty time color_list stopped]
 
 
 ; --- Agents ---
@@ -44,9 +44,6 @@ breed [vacuums vacuum]
 vacuums-own [beliefs desire intention own_color]
 
 
-patches-own [ ]
-
-undirected-link-breed [red-links red-link]
 ; --- Setup ---
 to setup
   clear-all
@@ -54,13 +51,10 @@ to setup
   set time 0
 
   set color_list n-of num_agents [yellow green blue red pink brown grey]
-  ;set index_list first-n num_agents [0 1 2 3 4 5 6]
-
-  ;set index_list n-values num_agents [?]
-
   setup-patches
   setup-vacuums
   setup-ticks
+  reset-timer
 end
 
 
@@ -82,15 +76,8 @@ end
 ; --- Setup patches ---
 to setup-patches
   ; In this method you may create the environment (patches), using colors to define cells with various types of dirt.
-  ;resize-world 0 (width - 1) 0 ( height - 1)
-  ;set-patch-size 400 / width
-  ;ask patches [set pcolor green]
-
-  set total_dirty  ( dirt_pct / 100 * 24 * 24 )
-  ; ask n-of total_dirty patches [set pcolor grey]
-  ask n-of total_dirty patches [set pcolor one-of color_list
-       ]
-;ask patches [ set plabel "+" ]
+  set total_dirty  ( dirt_pct / 100 * 25 * 25 )
+  ask n-of total_dirty patches [set pcolor one-of color_list]
 end
 
 
@@ -98,16 +85,14 @@ end
 to setup-vacuums
   ; In this method you may create the vacuum cleaner agents.
   create-vacuums num_agents [
-   setxy (( random 24) - 12 ) ((random 24) - 12)]
+   setxy (( random 25) - 12 ) ((random 25) - 12)]
    ask vacuums [
-   ;set desire (count patches with [ pcolor = grey ]) ; initialised desire to reduce the totoal amount of dirty cells
-    ; set color color_list [index]
-     set beliefs []
+   set beliefs []
    foreach (n-values num_agents [?]) [ask vacuum ?
      [set color item ? color_list
        set own_color color ]]
    let oc own_color
-    ask patches in-cone-nowrap vision_radius 360
+    ask patches in-cone-nowrap (vision_radius / 100 * 25) 360
    [
     set plabel-color oc
      set plabel "8"
@@ -139,12 +124,10 @@ to update-beliefs
 
  ask vacuums [
    let pc own_color
-   let newBelief ((patches in-cone-nowrap vision_radius 360) with [pcolor = pc])
+   let newBelief ((patches in-cone-nowrap (vision_radius / 100 * 25) 360) with [pcolor = pc])
    let oldBelief beliefs
    let n (patch-set newBelief oldBelief)
    set beliefs n
- ;set beliefs with [(member? self oldBelief) and (member? self newBelief)]
-
  ]
 
 end
@@ -170,7 +153,7 @@ to visio-cones
 
   ask vacuums[
     let oc own_color
-  ask patches in-cone-nowrap vision_radius 360
+  ask patches in-cone-nowrap (vision_radius / 100 * 25) 360
    [
     set plabel-color oc
      set plabel "8"
@@ -187,18 +170,9 @@ to execute-actions
     if (pcolor = own_color)
     [
       set pcolor black
-      ;let ind (item intention beliefs)
       set beliefs sort beliefs
       set beliefs remove intention beliefs
     ]
-
-;    ask patches in-cone-nowrap vision_radius 360
-;   [
-;    set plabel-color white
-;     set plabel ""
-;    ]
-
-    ;ask patches
 
     ifelse (intention != nobody)
     [
@@ -209,28 +183,31 @@ to execute-actions
     ]
     [
       stop
+      set stopped stopped + 1
     ]
     ]
     [
-      ;if (can-move? 1)
       ifelse (desire != 0)
       [
         ifelse can-move? 1
         [
           forward 1
-          ;visio-cones
         ]
         [
-      facexy (( random 24) - 12 ) ((random 24) - 12)
+      facexy (( random 25) - 12 ) ((random 25) - 13)
         ]
-      ;forward 1
       ]
       [
         stop
+        set stopped stopped + 1
       ]
     ]
 
 
+  ]
+  if (stopped != num_agents)
+  [
+  set time timer
   ]
 end
 @#$#@#$#@
@@ -270,7 +247,7 @@ dirt_pct
 dirt_pct
 0
 100
-2
+8
 1
 1
 NIL
@@ -351,7 +328,7 @@ vision_radius
 vision_radius
 0
 100
-6
+10
 1
 1
 NIL
