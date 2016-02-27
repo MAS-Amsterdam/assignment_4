@@ -24,7 +24,7 @@
 ;
 ; 1) total_dirty: this variable represents the amount of dirty cells in the environment.
 ; 2) time: the total simulation time.
-globals [total_dirty time color_list]
+globals [total_dirty time color_list available_colors]
 
 
 ; --- Agents ---
@@ -45,7 +45,7 @@ breed [vacuums vacuum]
 ; 6) outgoing_messages: list of messages sent by the agent to other agents
 ; 7) incoming_messages: list of messages received by the agent from other agents
 ; 8) all_out: the messages to be sent to other agents (so it does not send the same messages again)
-vacuums-own [beliefs desire intention own_color other_colors outgoing_messages all_out incoming_messages]
+vacuums-own [beliefs desire intention own_color other_colors outgoing_messages all_out incoming_messages color_record]
 
 
 ; --- Setup ---
@@ -55,7 +55,7 @@ to setup
   set time 0
 
   set color_list n-of num_agents [yellow green blue red pink brown grey]
-
+  set available_colors color_list
 
   setup-patches
   setup-vacuums
@@ -98,9 +98,17 @@ end
 to setup-patches
   ; In this method you may create the environment (patches), using colors to define cells with various types of dirt.
 
-  set total_dirty  ( dirt_pct / 100 * 24 * 24 )
+  set total_dirty  round(( dirt_pct / 100 * 25 * 25 ))
   ; ask n-of total_dirty patches [set pcolor grey]
-  ask n-of total_dirty patches [set pcolor one-of color_list ]
+  ;ask n-of total_dirty patches [set pcolor one-of color_list ]
+
+  foreach color_list [
+    ask n-of threshold patches with [pcolor = black] [
+      set pcolor ?
+    ]
+  ]
+  let already_set (count patches with [pcolor != black])
+  ask n-of (total_dirty - already_set) patches with [pcolor = black][set pcolor one-of color_list ]
   ;ask patches [ set plabel "+" ]
 
 end
@@ -120,21 +128,33 @@ to setup-vacuums
        set incoming_messages []
 
 
-   foreach (n-values num_agents [?]) [ ask vacuum ?
-     [
-       set color item ? color_list
-       set own_color color
-       ; new in a
-       set other_colors  ( remove own_color color_list)
+;   foreach (n-values num_agents [?]) [ ask vacuum ?
+;     [
+;       set color item ? color_list
+;       set own_color color
+;       ; new in a
+;       set other_colors  ( remove own_color color_list)
+;
+;       ]
+;   ]
 
-       ]
-   ]
+       set color_record []
 
+       ;foreach (n-values num_agents [?])
+       let total_color num_agents
+       foreach (n-values total_color [?]) [
+         let ele (list (item ? color_list) 0)
+         show ele
+         set color_record (fput ele color_record)
+         ]
+
+     set color white
    ask patches in-cone-nowrap vision_radius 360
    [
     set plabel-color white
      set plabel "*"
     ]
+
    ]
 
 end
@@ -163,10 +183,33 @@ to update-beliefs
  ; Also note that this method should distinguish between two cases, namely updating beliefs based on 1) observed information and 2) received messages.
   ask vacuums [
 ;
+
+    ifelse (own_color = white)
+    [
+
+      let around ((patches) in-cone-nowrap vision_radius 360) with [pcolor != black]
+       foreach (color_record) [
+         ;show ?
+         let clr (first ?)
+         let count_clr (last ?)
+
+         let count_ 0
+         set count_clr ((count (around with [pcolor = clr])) + count_clr)
+         let tmp (position ? color_record)
+         show tmp
+         set color_record replace-item tmp color_record (list clr count_clr)
+         ;set color_record fput (list clr count_clr)
+         ;set (last ?) count_clr
+
+
+
+         ]
+
+      ]
    ; set beliefs remove intention beliefs
 
    ; update the belief with the new information from other agents
-   set beliefs (patch-set incoming_messages beliefs)
+   [set beliefs (patch-set incoming_messages beliefs)
    set incoming_messages []
 
    let oc own_color
@@ -175,7 +218,6 @@ to update-beliefs
    let new_b (patch-set around old_b)
    set beliefs new_b
    set beliefs sort-on [distance myself] beliefs
-
 
   ; update the message to be sent (out)
   ; out = newly discovered dirts - the location of the dirts the agent already sent, which is outgoing_message
@@ -194,6 +236,8 @@ to update-beliefs
        set all_out (fput ? all_out)
        ]
      ]
+   ]
+show color_record
 ]
 end
 
@@ -263,7 +307,6 @@ to send-messages
   ]
 
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 786
@@ -299,9 +342,9 @@ SLIDER
 166
 dirt_pct
 dirt_pct
-num_agents * threshold
+num_agents * threshold * 0.16
 100
-100
+26.200000000000003
 1
 1
 NIL
@@ -382,7 +425,7 @@ vision_radius
 vision_radius
 0
 100
-5
+8
 1
 1
 NIL
@@ -605,8 +648,8 @@ SLIDER
 threshold
 threshold
 0
-100
-51
+10
+10
 1
 1
 NIL
