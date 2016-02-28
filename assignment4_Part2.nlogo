@@ -50,16 +50,13 @@ vacuums-own [beliefs desire intention own_color other_colors outgoing_messages a
 
 ; --- Setup ---
 to setup
-   clear-all
-
+  clear-all
   set time 0
-
   set color_list n-of num_agents [yellow green blue red pink brown grey]
-
-
   setup-patches
   setup-vacuums
   setup-ticks
+  reset-timer
 end
 
 
@@ -73,6 +70,7 @@ to go
   update-intentions
   execute-actions
   send-messages
+  set time timer
   tick
 end
 
@@ -100,9 +98,7 @@ to setup-patches
   ; In this method you may create the environment (patches), using colors to define cells with various types of dirt.
 
   set total_dirty  ( dirt_pct / 100 * 25 * 25 )
-  ; ask n-of total_dirty patches [set pcolor grey]
   ask n-of total_dirty patches [set pcolor one-of color_list ]
-  ;ask patches [ set plabel "+" ]
 
 end
 
@@ -125,9 +121,7 @@ to setup-vacuums
      [
        set color item ? color_list
        set own_color color
-       ; new in a
        set other_colors  ( remove own_color color_list)
-
        ]
    ]
 
@@ -233,7 +227,6 @@ to execute-actions
 
     if (own_color = pcolor)[
       set pcolor black; if it is dirty then I clean it
-      ; set intention nobody
       set beliefs remove intention beliefs
       set beliefs sort beliefs
       ]
@@ -302,7 +295,7 @@ dirt_pct
 dirt_pct
 0
 100
-14
+10
 1
 1
 NIL
@@ -375,15 +368,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-206
-772
-239
+6
+205
+773
+238
 vision_radius
 vision_radius
 0
 100
-28
+100
 1
 1
 NIL
@@ -601,24 +594,44 @@ time
 @#$#@#$#@
 ## WHAT IS IT?
 
-This model is an extention with the function of agent communication. Similar as part 1, we developed a team of vacuum cleaners. But now these agents can communicate with each other. When one agent observe a dirt not of its color, it tells the agent responsible for that color the location.
+This model is an extention with the feature of agent communication,which we implemented by developing a team of multiple smart vacuum cleaners in part 1. They all have the desire to clean all the dirts matching their colours in the environment. Each of the agents have a vision cone, which denotes the distance and the area it can see. The agents can know of only the dirts within their respective vision range. The agents can only clean dust that is of the same colours as them. The agents have the desire to clean all the dirt in the environment. They stop as soon as the last dirt corresponding to their colour has been cleaned. The difference now is that these agents can communicate with each other. When one agent observes a dirt not of its color, it sends out a message of the location to the agent responsible for that color .
 
 ## HOW IT WORKS
 
-Each agent has some messages to be sent (outgoing_messages) and all the messages sent (all_out) as well as a list of messages received (incoming_messages). These agents then analysis all the messages and add to their beliefs. In this homework, we consider only agents tell the location of a dirt once. That is, we have to record all the dirt that has been discovered by the agent so it does not repeat the same dirt in the message.
+Each vacuum has a list of messages to send (outgoing_messages) as well as a list of messages received (incoming_messages). It is designed to ensure that a specific location of dirt is sent by the same vacuum only once, by recording all the dirts that has been discovered by the vacuum (in all_out list).Vacuums analyse all the messages received and add new locations to their belief bases. So each of the vacuums sets up its own beliefs about the locations of the corresponding coloured dirts based on its vision cones and messages received.
+
+They also update their desires as a list of locations of all the same coloured dirts in the entire environment. The vacuums will always move to the nearest corresponding coloured dirt that is on their belief bases and clean it. Onece all of the corresponding coloured dirts have been cleaned, the desire of the vacuums is satisfied and thus they stop. The intentions of the vacuum cleaners at any given time are the nearest dirt cells on their belief bases.
+
 
 ## HOW TO USE IT
+Slider dirt_pct: Sets the dirt percent for the world
+Button setup: Sets up the world with the initial values defined in the function setup Button go: This triggers the agent code to run.
+Slider vision_radius: This is the percentage of the world that the agent can see
+Slider num_agents: This is the number of vacuum cleaners that will be spawned.
 
-Similar as part 1, the users first press the Setup button and then press either of the two go buttons.
+1) Set the dirt percent with the slider.
+2) Set the vision radius with the slider.
+3) Set the number of agents to be spawned with the slider.
+4) Setup the world with the setup button.
+5) Execute the model by pressing the go button on the right side. To see how the vacuum behave in a single step, press the go button on the left side.
 
 
 ## THINGS TO NOTICE
 
-Users are suggested to notice the messages between agents. These are displayed in the monitors. Due to the limit of the interface, only three agents' messages are on display.
+The monitor named outgoing_messages shows the messages of the location of dirts related to other vacuums that is observed in its current vision cone.
+The monitor named incoming_messages shows the messages it recceived from other vacuums, about the location of the dirts in its color.
+
+Each agent has their own vision cones represented by the same colour.
+
+
 
 ## THINGS TO TRY
 
-Users can try to increase the vision radius so the agent observe more dirts. The more the agent can observe, the faster the cleaning process is.
+The dirt percentage can be modified by using the slider labelled dirt_pct.
+The vision cone and number of agents can be modified by using the slider labelled vision_radius and num_agents, respectively.
+The execution time reduces as the different values are varied. If the vision is made 100%, then the entire world is visible and so there is no need for exploration. Increasing the dirt amount too reduces the random walk required, because most of the dirt has a higher of being "spotted" while moving to clean other dust and thus be added to it's belief base. Thus the execution time decreseases even when the vision radius is comparatively small, and thus random exploration is reduced.
+
+
 
 ## EXTENDING THE MODEL
 
@@ -628,13 +641,11 @@ The users may want to extend the monitor with a display of the total number of m
 
 This time we allows communication between agents. That is, each agent has the right to update all other agent's indox, which might be dangerous.
 
-## RELATED MODELS
 
-N|A
-
-## CREDITS AND REFERENCES
-
-http://www.intro-to-abm.com
+## CREDITS
+Shuai Wang (11108339)
+Kaixin Hu (11129417)
+Partha Das (11137053)
 @#$#@#$#@
 default
 true
