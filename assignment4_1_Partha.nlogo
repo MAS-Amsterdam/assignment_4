@@ -247,7 +247,7 @@ dirt_pct
 dirt_pct
 0
 100
-8
+100
 1
 1
 NIL
@@ -484,40 +484,38 @@ This model explores the behavior of multiple smart vacuum cleaners with beliefs,
 
 ## HOW IT WORKS
 
-The vacuum sets up its beliefs about the location of the dirts in the environment, and the location is ranked in left-to-right,top-to-bottom order. The vacuum updates its beliefs every step to check and remove the dirts' location that has been cleaned, and accordingly updates its desire and intentions.
-It has desires to clean all the dirts in the environment, when there is no dirt, the vacuum dies (disappear).
-It has the intention to clean the location ranking first in the current beliefs base.
-
-Each of the sets up their own beliefs about the
+Each of the sets up their own beliefs about the location of the same coloured dirt within their vision cones. They also update their desires as a list of locations of all the same coloured dirts in the entire environment. The vacuums will always move to the nearest similarly coloured dirt that is within their vision cones and clean it. Ones all of the similarly coloured dirts have been cleaned, the desire of the vacuums are satisfied and so they stop. The intentions of the vacuum cleaner at any given time is the nearest dirt cell within their vision cones.
 
 ## HOW TO USE IT
 Slider dirt_pct: Sets the dirt percent for the world
 Button setup: Sets up the world with the initial values defined in the function setup Button go: This triggers the agent code to run.
-Slider width: Sets the width of the grid.
-Slider height: Sets the height of the grid.
+Slider vision_radius: This is the percentage of the world that the agent can see
+Slider num_agents: This is the number of vacuum cleaners that will be spawned.
 
 1) Set the dirt percent with the slider.
-2) Set the height of the grid with the slider.
-3) Set the width of the grid with the slider.
+2) Set the vision radius with the slider.
+3) Set the number of agents to be spawned with the slider.
 4) Setup the world with the setup button.
 5) Execute the model by pressing the go button on the right side. To see how the vacuum behave in a single step, press the go button on the left side.
 
 
 
 ## THINGS TO NOTICE
-The number of dirty cells left is tracked on the monitor labelled "dirt".
-The vacuums current desire is tracked on the monitor labelled "The agent's current desire" . Note it will decrease as the cacuum cleans dirt. When it is 0, the vacuum has no desires, and dies.
-The vacuum's beliefs about the dirts' location is tracked on the monitor labelled "The agent's current belief base".
-The vacuum's intention is tracked on the monitor labelled"The agent's current intention". Note that the vacuums intention will alwyas be the first belief on the beliefs base.
-The total time it took to clean the environment is tracked on the monitor labelled"Total simulation time".
+
+The details of the first 3 vacuums are tracked with the following monitors. All of the vacuums are not tracked because of space constraints.
+The colour of the vacuum is tracked in the monitor named the colour of vacuum. It is an in-built netlogo constant so it shows up as a number. It can be checked by inspecting the desired vacuum in the netlogo world monitor.
+The monitor named Beliefs of the Vacuum shows the set of patches that the particular vacuum believes to be dirty, that is contains the same coloured dirts as itself, within it's vision range.
+The monitor named Intention of the Vacuum shows the coordinates of the nearest dirty cell of the same colour within it's vision range.
+The monitor named Desire of the Vacuum shows the count of the total number of dirty cells of the same colour as the agent in the world. The agent stops as soon as the desire reaches zero.
+Each agent has their own vision cones represented by the same colour.
 
 
 ## THINGS TO TRY
 
 The dirt percentage can be modified by using the slider labelled dirt_pct.
-The grid height and the width can be modified by using the slider labelled heigth and width, respectively.
-How is the variance of the time it took to clean the environment varies as the percentage of dirts changes.
-
+The vision cone and number of agents can be modified by using the slider labelled vision_radius and num_agents, respectively.
+The execution time reduces as the different values are varied. If the vision is made 100%, then the entire world is visible and so there is no need for exploration. Increasing the dirt amount too reduces the random walk required, because most of the dirt has a higher of being "spotted" while moving to clean other dust and thus be added to it's belief base. Thus the execution time decreseases even when the vision radius is comparatively small, and thus random exploration is reduced.
+Random exploration adds to the execution time.
 
 
 ## CREDITS
