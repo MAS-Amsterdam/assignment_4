@@ -125,7 +125,7 @@ to setup-vacuums
   ; In this method you may create the vacuum cleaner agents.
  ; In this method you may create the vacuum cleaner agents.
   create-vacuums num_agents [
-   setxy (( random 24) - 12 ) ((random 24) - 12)]
+   setxy (( random 25) - 12 ) ((random 25) - 12)]
 
    ask vacuums [
    set all_out []
