@@ -211,8 +211,8 @@ to update-beliefs
          ; if this count_clr is greater than the threshold (and the color is avaliable) then set the agent's color to the color
          if ((count_clr > threshold) and (member? clr available_colors)) [
            set color clr
-           set available_colors (remove clr available_colors)f
-           set own-color clr
+           set available_colors (remove clr available_colors)
+           set own_color clr
            ]
 
          let pos  (position ? color_record) ; the index of the one color record

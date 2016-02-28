@@ -263,7 +263,6 @@ to send-messages
   ]
 
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 786
@@ -600,39 +599,40 @@ time
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+This model is an extention with the function of agent communication. Similar as part 1, we developed a team of vacuum cleaners. But now these agents can communicate with each other. When one agent observe a dirt not of its color, it tells the agent responsible for that color the location.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+Each agent has some messages to be sent (outgoing_messages) and all the messages sent (all_out) as well as a list of messages received (incoming_messages). These agents then analysis all the messages and add to their beliefs. In this homework, we consider only agents tell the location of a dirt once. That is, we have to record all the dirt that has been discovered by the agent so it does not repeat the same dirt in the message.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Similar as part 1, the users first press the Setup button and then press either of the two go buttons.
+
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+Users are suggested to notice the messages between agents. These are displayed in the monitors. Due to the limit of the interface, only three agents' messages are on display.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+Users can try to increase the vision radius so the agent observe more dirts. The more the agent can observe, the faster the cleaning process is.
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+The users may want to extend the monitor with a display of the total number of messages sent (or received) regarding different vision radiuses.
 
 ## NETLOGO FEATURES
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+This time we allows communication between agents. That is, each agent has the right to update all other agent's indox, which might be dangerous.
 
 ## RELATED MODELS
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+N|A
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+http://www.intro-to-abm.com
 @#$#@#$#@
 default
 true
