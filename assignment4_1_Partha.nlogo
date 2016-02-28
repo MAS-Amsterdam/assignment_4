@@ -92,7 +92,7 @@ to setup-vacuums
      [set color item ? color_list
        set own_color color ]]
    let oc own_color
-    ask patches in-cone-nowrap (vision_radius / 100 * 25) 360
+    ask patches in-cone-nowrap (vision_radius / 100 * 12) 360
    [
     set plabel-color oc
      set plabel "8"
@@ -124,7 +124,7 @@ to update-beliefs
 
  ask vacuums [
    let pc own_color
-   let newBelief ((patches in-cone-nowrap (vision_radius / 100 * 25) 360) with [pcolor = pc])
+   let newBelief ((patches in-cone-nowrap (vision_radius / 100 * 12) 360) with [pcolor = pc])
    let oldBelief beliefs
    let n (patch-set newBelief oldBelief)
    set beliefs n
@@ -153,7 +153,7 @@ to visio-cones
 
   ask vacuums[
     let oc own_color
-  ask patches in-cone-nowrap (vision_radius / 100 * 25) 360
+  ask patches in-cone-nowrap (vision_radius / 100 * 12) 360
    [
     set plabel-color oc
      set plabel "8"
@@ -194,7 +194,7 @@ to execute-actions
           forward 1
         ]
         [
-      facexy (( random 25) - 12 ) ((random 25) - 13)
+      facexy (( random 25) - 12 ) ((random 25) - 12)
         ]
       ]
       [
@@ -328,7 +328,7 @@ vision_radius
 vision_radius
 0
 100
-10
+50
 1
 1
 NIL

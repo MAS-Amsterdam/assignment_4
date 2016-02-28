@@ -85,9 +85,10 @@ to update-vision
      ask vacuum ? [
        set color item ? color_list
        set own_color color]]
-    ask patches in-cone-nowrap vision_radius 360
+    let oc own_color
+  ask patches in-cone-nowrap (vision_radius / 100 * 12) 360
    [
-    set plabel-color white
+    set plabel-color oc
      set plabel "*"
     ]
    ]
@@ -98,7 +99,7 @@ end
 to setup-patches
   ; In this method you may create the environment (patches), using colors to define cells with various types of dirt.
 
-  set total_dirty  ( dirt_pct / 100 * 24 * 24 )
+  set total_dirty  ( dirt_pct / 100 * 25 * 25 )
   ; ask n-of total_dirty patches [set pcolor grey]
   ask n-of total_dirty patches [set pcolor one-of color_list ]
   ;ask patches [ set plabel "+" ]
@@ -111,7 +112,7 @@ to setup-vacuums
   ; In this method you may create the vacuum cleaner agents.
  ; In this method you may create the vacuum cleaner agents.
   create-vacuums num_agents [
-   setxy (( random 24) - 12 ) ((random 24) - 12)]
+   setxy (( random 25) - 12 ) ((random 25) - 12)]
 
    ask vacuums [
    set all_out []
@@ -130,9 +131,10 @@ to setup-vacuums
        ]
    ]
 
-   ask patches in-cone-nowrap vision_radius 360
+   let oc own_color
+  ask patches in-cone-nowrap (vision_radius / 100 * 12) 360
    [
-    set plabel-color white
+    set plabel-color oc
      set plabel "*"
     ]
    ]
@@ -170,7 +172,7 @@ to update-beliefs
    set incoming_messages []
 
    let oc own_color
-   let around (((patches) in-cone-nowrap vision_radius 360) with [pcolor = oc])
+   let around (((patches) in-cone-nowrap (vision_radius / 100 * 12) 360) with [pcolor = oc])
    let old_b beliefs
    let new_b (patch-set around old_b)
    set beliefs new_b
@@ -181,7 +183,7 @@ to update-beliefs
   ; out = newly discovered dirts - the location of the dirts the agent already sent, which is outgoing_message
   ; each message, there is the color of the dirt and the location of the dirt?
 
-  let around_others (((patches) in-cone-nowrap vision_radius 360) with [(pcolor != oc) and (pcolor != black)])
+  let around_others (((patches) in-cone-nowrap (vision_radius / 100 * 12) 360) with [(pcolor != oc) and (pcolor != black)])
   set around_others sort-on [distance myself] around_others
   ; remove the elements of message_out from around_others to obtain the newly discovered patches
   foreach (around_others) [
@@ -381,7 +383,7 @@ vision_radius
 vision_radius
 0
 100
-2
+28
 1
 1
 NIL
