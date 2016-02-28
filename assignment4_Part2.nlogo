@@ -186,6 +186,7 @@ to update-beliefs
      ifelse (member? ? all_out)
      []; simply disgard it
      [ ; otherwise, we prepare to send the message, i.e. update the out box
+       set outgoing_messages []
        set outgoing_messages (fput ? outgoing_messages) ; as my current message to be sent
        set all_out (fput ? all_out)
        ]
@@ -253,7 +254,7 @@ to send-messages
          ]
       ]
    ]
-     set outgoing_messages []
+
 
   ]
 
