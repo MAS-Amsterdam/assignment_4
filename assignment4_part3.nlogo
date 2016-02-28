@@ -51,16 +51,14 @@ vacuums-own [beliefs desire intention own_color other_colors outgoing_messages a
 
 ; --- Setup ---
 to setup
-   clear-all
-
+  clear-all
   set time 0
-
   set color_list n-of num_agents [yellow green blue red pink brown grey]
   set available_colors color_list
-
   setup-patches
   setup-vacuums
   setup-ticks
+  reset-timer
 end
 
 
@@ -74,6 +72,7 @@ to go
   update-intentions
   execute-actions
   send-messages
+  set time timer
   tick
 end
 
@@ -110,17 +109,13 @@ to setup-patches
   ; In this method you may create the environment (patches), using colors to define cells with various types of dirt.
 
   set total_dirty  round(( dirt_pct / 100 * 25 * 25 ))
-  ; ask n-of total_dirty patches [set pcolor grey]
-  ;ask n-of total_dirty patches [set pcolor one-of color_list ]
-
   foreach color_list [
-    ask n-of threshold patches with [pcolor = black] [
-      set pcolor ?
+   ask n-of threshold patches with [pcolor = black] [
+   set pcolor ?
     ]
   ]
   let already_set (count patches with [pcolor != black])
   ask n-of (total_dirty - already_set) patches with [pcolor = black][set pcolor one-of color_list ]
-  ;ask patches [ set plabel "+" ]
 
 end
 
@@ -136,36 +131,23 @@ to setup-vacuums
    set all_out []
    set beliefs []
    set outgoing_messages []
-       set incoming_messages []
+   set incoming_messages []
+   set observed []
+   set color_record []
 
+   let total_color num_agents
+   foreach (n-values total_color [?]) [
+   let ele (list (item ? color_list) 0)
+   set color_record (fput ele color_record)
+    ]
 
-;   foreach (n-values num_agents [?]) [ ask vacuum ?
-;     [
-;       set color item ? color_list
-;       set own_color color
-;       ; new in a
-;       set other_colors  ( remove own_color color_list)
-;
-;       ]
-;   ]
-      set observed []
-       set color_record []
-
-       ;foreach (n-values num_agents [?])
-       let total_color num_agents
-       foreach (n-values total_color [?]) [
-         let ele (list (item ? color_list) 0)
-         show ele
-         set color_record (fput ele color_record)
-         ]
-
-     set color white
-     set own_color white
+   set color white
+    set own_color white
    let oc own_color
-    ask patches in-cone-nowrap (vision_radius / 100 * 12) 360
+   ask patches in-cone-nowrap (vision_radius / 100 * 12) 360
    [
     set plabel-color oc
-     set plabel "*"
+    set plabel "*"
     ]
 
    ]
@@ -193,9 +175,6 @@ to update-desires
 
     ]
   ]
-
-  ;foreach (n-values num_agents [?]) [ask vacuum ? [set desire (count patches with [pcolor = (item ? color_list)])]]
-
 end
 
 
@@ -211,10 +190,8 @@ to update-beliefs
     [
       let ob observed
       let around ((patches) in-cone-nowrap (vision_radius / 100 * 12) 360) with [(pcolor != black) and (not member? self ob)]
-      show around
 
       foreach (color_record) [
-         ;show ?
          let clr (first ?)
          let count_clr (last ?)
          let around_clr (around with [pcolor = clr])
@@ -259,12 +236,13 @@ to update-beliefs
      ifelse (member? ? all_out)
      []; simply disgard it
      [ ; otherwise, we prepare to send the message, i.e. update the out box
+       set outgoing_messages []
        set outgoing_messages (fput ? outgoing_messages) ; as my current message to be sent
        set all_out (fput ? all_out)
        ]
      ]
    ]
-show color_record
+
 ]
 end
 
@@ -327,6 +305,7 @@ to send-messages
   ; Here should put the code related to sending messages to other agents.
   ; Note that this could be seen as a special case of executing actions, but for conceptual clarity it has been put in a separate method.
   ask vacuums [
+
      foreach (outgoing_messages) [
      let pcl ([pcolor] of ?)
      let msg ?
@@ -339,8 +318,6 @@ to send-messages
          ]
       ]
    ]
-     set outgoing_messages []
-
   ]
 
 end
@@ -381,7 +358,7 @@ dirt_pct
 dirt_pct
 num_agents * threshold * 0.16
 100
-14.2
+10
 1
 1
 NIL
@@ -462,7 +439,7 @@ vision_radius
 vision_radius
 0
 100
-34
+37
 1
 1
 NIL
@@ -695,39 +672,50 @@ HORIZONTAL
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+This model is an extention of agent communication,which we implemented by developing a team of multiple smart vacuum cleaners in part 2. The difference is that the vacuums coordinate to collect what kind of dirts by exploring the world. When the number of beliefs of one particular vacuum about dirty locations of a particular colour first reaches a threshold, the vacuum become responsible for that color.
+
+They all have the desire to clean all the dirts matching their colours in the environment. Each of the agents have a vision cone, which denotes the distance and the area it can see. The agents can know of only the dirts within their respective vision range. The agents can only clean dust that is of the same colours as them. The agents have the desire to clean all the dirt in the environment. They stop as soon as the last dirt corresponding to their colour has been cleaned. These agents can communicate with each other. When one agent observes a dirt not of its color, it sends out a message of the location to the agent responsible for that color .
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+
+At start, each vacuum explores the world randomly, and adds the observed dirt to its own belief bese, when the number of a specific color in its belief base is greater than the threshold (and the color is avaliable) then set the agent's color to the color.The last vacuum is set the remaining color automatically.
+
+During the rest peocess of this model, the design is same with part 2. Each vacuum has a list of messages to send (outgoing_messages) as well as a list of messages received (incoming_messages). It is designed to ensure that a specific location of dirt is sent by the same vacuum only once, by recording all the dirts that has been discovered by the vacuum (in all_out list).Vacuums analyse all the messages received and add new locations to their belief bases. So each of the vacuums sets up its own beliefs about the locations of the corresponding coloured dirts based on its vision cones and messages received.
+
+They also update their desires as a list of locations of all the same coloured dirts in the entire environment. The vacuums will always move to the nearest corresponding coloured dirt that is on their belief bases and clean it. Onece all of the corresponding coloured dirts have been cleaned, the desire of the vacuums is satisfied and thus they stop. The intentions of the vacuum cleaners at any given time are the nearest dirt cells on their belief bases.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Slider dirt_pct: Sets the dirt percent for the world
+Button setup: Sets up the world with the initial values defined in the function setup Button go: This triggers the agent code to run.
+Slider vision_radius: This is the percentage of the world that the agent can see
+Slider num_agents: This is the number of vacuum cleaners that will be spawned.
+Slider threshold: This is the number of a specific color of dirts that vokes a specific vacuum to start to be responsible for dirts of that color when all the vacuums start by exploring the world.
+
+1) Set the dirt percent with the slider.
+2) Set the vision radius with the slider.
+3) Set the number of agents to be spawned with the slider.
+4) Ser the threshold of the responsible color with the slider.
+5) Setup the world with the setup button.
+6) Execute the model by pressing the go button on the right side. To see how the vacuum behave in a single step, press the go button on the left side.
 
 ## THINGS TO NOTICE
+At start, the vacuums' color are white, indicating that they are not responsible for any color. As they explore the world, when the number of one color dirts on the belief bases reaches the threshold, the vacuums' color turns to each's responsible color respectively. And then the vacuums start to clean their corresponding color and send/receive messages as the vacuums do in part 2 of this model.
 
-(suggested things for the user to notice while running the model)
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+The dirt percentage can be modified by using the slider labelled dirt_pct.
+The vision cone and number of agents can be modified by using the slider labelled vision_radius and num_agents, respectively.
+The execution time reduces as the different values are varied. If the vision is made 100%, then the entire world is visible and so there is no need for exploration. Increasing the dirt amount too reduces the random walk required, because most of the dirt has a higher of being "spotted" while moving to clean other dust and thus be added to it's belief base. Thus the execution time decreseases even when the vision radius is comparatively small, and thus random exploration is reduced.
+Threshold can be modified by using the slider labelled threshold. Try to explore how the time took to clean the world set by different level of dirt percentage changes as the threshold increases from 1 to 10.
 
-## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+## CREDITS
+Shuai Wang (11108339)
+Kaixin Hu (11129417)
+Partha Das (11137053)
 @#$#@#$#@
 default
 true
