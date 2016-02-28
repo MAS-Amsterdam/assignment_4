@@ -3,6 +3,7 @@
 ; Lab assistants: D. Formolo & L. Medeiros
 
 
+
 ; --- Assignment 4.2 & 4.3 - Template ---
 ; Please use this template as a basis for the code to generate the behaviour of your team of vacuum cleaners.
 ; However, feel free to extend this with any variable or method you think is necessary.
@@ -195,33 +196,27 @@ to update-beliefs
 
     ifelse (own_color = white)
     [
+      let ob observed
+      let around ((patches) in-cone-nowrap vision_radius 360) with [(pcolor != black) and (not member? self ob)]
+      show around
 
-      let around  ((patches) in-cone-nowrap vision_radius 360) with [(pcolor != black)]
-      let tmp_set []
-      let around_l (sort around)
-      foreach around_l [
-        if (not(member? ? observed)) ; not previously observed
-        [set tmp_set (fput ? tmp_set)]
-        ]
-      set around tmp_set; new around
-
-      ; set around (around with [not(member? self observed)])
-       foreach (color_record) [
+      foreach (color_record) [
          ;show ?
          let clr (first ?)
          let count_clr (last ?)
-
-         let count_ 0
-         let l (length sort-on [distance myself] ( around with [pcolor = clr]))
+         let around_clr (around with [pcolor = clr])
+         let l (count around_clr)
          set count_clr ((l) + count_clr)
-         let tmp (position ? color_record)
-         show tmp
-         set color_record replace-item tmp color_record (list clr count_clr)
-         ;set color_record fput (list clr count_clr)
-         ;set (last ?) count_clr
 
+         ; if this count_clr is greater than the threshold (and the color is avaliable) then set the agent's color to the color
+         if ((count_clr > threshold) and (member? clr available_colors)) [
+           set color clr
+           set available_colors (remove clr available_colors)f
+           set own-color clr
+           ]
 
-
+         let pos  (position ? color_record) ; the index of the one color record
+         set color_record (replace-item pos color_record (list clr count_clr)) ;replace
          ]
       set observed (patch-set around observed)
       ]
@@ -330,11 +325,11 @@ end
 GRAPHICS-WINDOW
 786
 46
-1303
-584
+1045
+326
 12
 12
-20.31
+10.0
 1
 10
 1
@@ -444,7 +439,7 @@ vision_radius
 vision_radius
 0
 100
-9
+2
 1
 1
 NIL
@@ -668,7 +663,7 @@ threshold
 threshold
 0
 10
-10
+4
 1
 1
 NIL
