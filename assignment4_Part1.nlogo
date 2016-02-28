@@ -95,7 +95,7 @@ to setup-vacuums
     ask patches in-cone-nowrap (vision_radius / 100 * 12) 360
    [
     set plabel-color oc
-     set plabel "8"
+     set plabel "*"
     ]
    ]
 
@@ -247,7 +247,7 @@ dirt_pct
 dirt_pct
 0
 100
-100
+9
 1
 1
 NIL
@@ -328,7 +328,7 @@ vision_radius
 vision_radius
 0
 100
-50
+100
 1
 1
 NIL
@@ -484,7 +484,7 @@ This model explores the behavior of multiple smart vacuum cleaners with beliefs,
 
 ## HOW IT WORKS
 
-Each of the sets up their own beliefs about the location of the same coloured dirt within their vision cones. They also update their desires as a list of locations of all the same coloured dirts in the entire environment. The vacuums will always move to the nearest similarly coloured dirt that is within their vision cones and clean it. Ones all of the similarly coloured dirts have been cleaned, the desire of the vacuums are satisfied and so they stop. The intentions of the vacuum cleaner at any given time is the nearest dirt cell within their vision cones.
+Each of the vacuum sets up its own beliefs about the location of the corresponding coloured dirts within its vision cones. They also update their desires as a list of locations of all the same coloured dirts in the entire environment. The vacuums will always move to the nearest corresponding coloured dirt that is on their belief bases and clean it. Onece all of the corresponding coloured dirts have been cleaned, the desire of the vacuums is satisfied and thus they stop. The intentions of the vacuum cleaners at any given time are the nearest dirt cells on their belief bases.
 
 ## HOW TO USE IT
 Slider dirt_pct: Sets the dirt percent for the world
